@@ -8,7 +8,7 @@ public class Main {
         Scanner iScanner = new Scanner( System.in, "CP866" );
 
         Shop shop = new Shop();
-        String filePath = "Products.csv";
+        String filePath = "products.csv";
         shop.addFromFile( filePath );
 
         int    id     = 0;
