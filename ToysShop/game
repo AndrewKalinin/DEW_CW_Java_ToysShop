@@ -1,0 +1,59 @@
+
+
+    private static String selectRandomToy(List<String> toys) {
+        double totalProbability = 0.0;
+        for (String toy : toys) {
+            totalProbability += Double.parseDouble(toy.split(",")[3].replaceAll("%", "")) / 100.0;
+        }
+        double randomValue = random.nextDouble() * totalProbability;
+        double accumulatedProbability = 0.0;
+        for (String toy : toys) {
+            double toyProbability = Double.parseDouble(toy.split(",")[3].replaceAll("%", "")) / 100.0;
+            accumulatedProbability += toyProbability;
+            if (accumulatedProbability >= randomValue) {
+                return toy.split(",")[1];
+            }
+        }
+        return null;
+    }
+
+    private static void writePlayedToyToFile(String toy) {
+      List<String> toys = readToysFromFile();
+      boolean toyFound = false;
+      for (int i = 0; i < toys.size(); i++) {
+          String[] toyData = toys.get(i).split(",");
+          if (toyData[1].equals(toy.split(",")[0])) {
+              int quantity = Integer.parseInt(toyData[2]) - 1;
+              toys.set(i, toyData[0] + "," + toyData[1] + "," + quantity + "," + toyData[3]);
+              toyFound = true;
+              break;
+          }
+      }
+
+      try (BufferedReader reader = new BufferedReader(new FileReader(PARTICIPATING_TOYS))) {
+          List<String> playedToys = new ArrayList<>();
+          String line;
+          boolean toyFound2 = false;
+          while ((line = reader.readLine()) != null) {
+              String[] playedToyData = line.split(",");
+              if (playedToyData[1].equals(toy.split(",")[0])) {
+                  int quantity = Integer.parseInt(playedToyData[2]) + 1;
+                  line = playedToyData[0] + "," + playedToyData[1] + "," + quantity;
+                  toyFound2 = true;
+              }
+              playedToys.add(line);
+          }
+
+          if (!toyFound2) {
+              int id = 0;
+              for (String playedToy : playedToys) {
+                  String[] playedToyData = playedToy.split(",");
+                  id = Math.max(id, Integer.parseInt(playedToyData[0]));
+              }
+              int quantity = 1;
+              String name = toy.split(",")[0];
+              String playedToyEntry = (id + 1) + "," + name + "," + quantity;
+              playedToys.add(playedToyEntry);
+          }
+    }
+}
